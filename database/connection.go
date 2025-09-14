@@ -13,15 +13,18 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	// Load .env
 	if err := godotenv.Load(); err != nil {
-		log.Fatal("❌ Gagal load .env")
+		log.Println("⚠️ .env not found, menggunakan environment variables dari sistem")
 	}
 
 	dburl := os.Getenv("DATABASE_URL")
+	if dburl == "" {
+		log.Fatal("❌ DATABASE_URL belum di-set")
+	}
+
 	database, err := gorm.Open(postgres.Open(dburl), &gorm.Config{})
 	if err != nil {
-		log.Fatal("❌ Gagal koneksi database")
+		log.Fatal("❌ Gagal koneksi database:", err)
 	}
 
 	fmt.Println("✅ Koneksi database berhasil")
