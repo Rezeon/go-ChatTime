@@ -37,6 +37,6 @@ func main() {
 		port = "8080" // default lokal
 	}
 
-	r.Run(":" + port)
+	r.Run("0.0.0.0:" + port)
 
 }
