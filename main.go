@@ -5,6 +5,7 @@ import (
 	"gotry/models"
 	"gotry/routes"
 	"gotry/ws"
+	"os"
 
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -31,7 +32,11 @@ func main() {
 	go ws.HandleMessage()
 	logger.Info("Server running at http://localhost:8080")
 
-	if err := r.Run(":8080"); err != nil {
-		logger.Fatal("Failed to run server", zap.Error(err))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // default lokal
 	}
+
+	r.Run(":" + port)
+
 }
