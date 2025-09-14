@@ -34,4 +34,7 @@ Thumbs.db
 *.tmp
 *.temp
 *.log
+# Environment files
 .env
+.env.local
+.env.*.local
