@@ -1,0 +1,629 @@
+type: collection.insomnia.rest/5.0
+name: My first collection
+meta:
+  id: wrk_0f2e3cfe5dec4ee19cb0ebbe675d6a37
+  created: 1757826919587
+  modified: 1757826919587
+  description: ""
+collection:
+  - name: Post
+    meta:
+      id: fld_75fb7c0508d34d7cab611a8cd5ce3a1e
+      created: 1757875687024
+      modified: 1757875687024
+      sortKey: -1757875687024
+      description: ""
+    children:
+      - url: "{{ _.baseurl }}posts"
+        name: Posting
+        meta:
+          id: req_ce2a033b5712475991147e08c485dd0a
+          created: 1757831077261
+          modified: 1757875696963
+          isPrivate: false
+          description: make post
+          sortKey: -1757875696882
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"content" : "haii"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_1bef2e4576ba4ef4ad04cdde59d92a01
+          - id: pair_e9b1583d4c4546319fc67fd9b0cdf8c6
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}posts/5"
+        name: Posting/id
+        meta:
+          id: req_65e80de8d65a4e3c9bb2e6f5b299170b
+          created: 1757873533117
+          modified: 1757875704072
+          isPrivate: false
+          description: get post by id
+          sortKey: -1757875696982
+        method: GET
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"content" : "haii"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_1bef2e4576ba4ef4ad04cdde59d92a01
+          - id: pair_e9b1583d4c4546319fc67fd9b0cdf8c6
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}posts/5"
+        name: Posting/id
+        meta:
+          id: req_364f8bc8f4304772a8d95a626bcaa92b
+          created: 1757873658805
+          modified: 1757875708168
+          isPrivate: false
+          description: "update post "
+          sortKey: -1757875697082
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"content" : "haii bro"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_1bef2e4576ba4ef4ad04cdde59d92a01
+          - id: pair_e9b1583d4c4546319fc67fd9b0cdf8c6
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}posts/5"
+        name: Posting/id
+        meta:
+          id: req_5ba6917266564c16b764d72d88e7271b
+          created: 1757873701898
+          modified: 1757875729302
+          isPrivate: false
+          description: delete post
+          sortKey: -1757875697182
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"content" : "haii bro"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_1bef2e4576ba4ef4ad04cdde59d92a01
+          - id: pair_e9b1583d4c4546319fc67fd9b0cdf8c6
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Follow
+    meta:
+      id: fld_4a7916a7d10e43e6b601089a1c9d1add
+      created: 1757875734571
+      modified: 1757875734571
+      sortKey: -1757875734571
+      description: ""
+    children:
+      - url: "{{ _.baseurl }}follow"
+        name: Follow
+        meta:
+          id: req_f9a38fd8a86f4efe93989f8385f642be
+          created: 1757870902992
+          modified: 1757875739361
+          isPrivate: false
+          description: this path for follow someone
+          sortKey: -1757875739222
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"follower_id" : 3,
+            	"followed_id": 4
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_ca98d7824a1246edb9557c0a688d0004
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_f0b50232fe414800b39d5ce12a37d12b
+          - id: pair_4c0c7a5ac5304b11b5d7aa5cdd1b61fe
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}follow/unfollow"
+        name: unfollow
+        meta:
+          id: req_92c9609b2b6d41d3aa8660e457493d04
+          created: 1757873871615
+          modified: 1757875746196
+          isPrivate: false
+          description: this path fr unfollow someone
+          sortKey: -1757875739322
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"followed_id": 4
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_ca98d7824a1246edb9557c0a688d0004
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_f0b50232fe414800b39d5ce12a37d12b
+          - id: pair_4c0c7a5ac5304b11b5d7aa5cdd1b61fe
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Message
+    meta:
+      id: fld_6e38d409f2d24f898bfe2b7c916c948c
+      created: 1757875756880
+      modified: 1757875770387
+      sortKey: -1757875756930
+      description: ""
+    children:
+      - url: "{{ _.baseurl }}messages/"
+        name: Message
+        meta:
+          id: req_a299228d79c94135bd09632c051620a9
+          created: 1757833210784
+          modified: 1757875772976
+          isPrivate: false
+          description: for makae message for fllower
+          sortKey: -1757875772838
+        method: POST
+        body:
+          mimeType: application/json
+          text: |+
+            {
+                "receiver_id": 3,
+                "content": "Halo, ini pesan dari Insomnia"
+              }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_fcce81027b4a4cdd81481f2742f70812
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_f25c5c160fbf4da7a1aeec3c0e6e1f52
+          - id: pair_7244a39360d04652a5aec63e344aa92d
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}messages/4"
+        name: Message/id
+        meta:
+          id: req_75b621e20246413cac8b35b0ce904f89
+          created: 1757873745291
+          modified: 1757875792166
+          isPrivate: false
+          description: ge message by id
+          sortKey: -1757875772938
+        method: GET
+        body:
+          mimeType: application/json
+          text: |+
+            {
+                "receiver_id": 3,
+                "content": "Halo, ini pesan dari Insomnia"
+              }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_fcce81027b4a4cdd81481f2742f70812
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_f25c5c160fbf4da7a1aeec3c0e6e1f52
+          - id: pair_7244a39360d04652a5aec63e344aa92d
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}messages/4"
+        name: Message/id
+        meta:
+          id: req_4e683b69f8af42d8a9631f47df7da8ad
+          created: 1757873789263
+          modified: 1757875795745
+          isPrivate: false
+          description: update message
+          sortKey: -1757875773038
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |+
+            {
+                "receiver_id": 3,
+                "content": "Halo, ini pesan dari rheyno"
+              }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_fcce81027b4a4cdd81481f2742f70812
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_f25c5c160fbf4da7a1aeec3c0e6e1f52
+          - id: pair_7244a39360d04652a5aec63e344aa92d
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}messages/4"
+        name: Message/id
+        meta:
+          id: req_31e21dd662694a72af3d202aa50ebd13
+          created: 1757873820103
+          modified: 1757875811045
+          isPrivate: false
+          description: delete message
+          sortKey: -1757875773138
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |+
+            {
+                "receiver_id": 3,
+                "content": "Halo, ini pesan dari rheyno"
+              }
+
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_fcce81027b4a4cdd81481f2742f70812
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_f25c5c160fbf4da7a1aeec3c0e6e1f52
+          - id: pair_7244a39360d04652a5aec63e344aa92d
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Auth
+    meta:
+      id: fld_40819f415ad849558b8761c5d3556b84
+      created: 1757875832194
+      modified: 1757875878061
+      sortKey: -1757875832394
+      description: ""
+    children:
+      - url: "{{ _.baseurl }}login"
+        name: Login
+        meta:
+          id: req_8d80dc929f864aa095e85143ee08f956
+          created: 1757828399978
+          modified: 1757875847152
+          isPrivate: false
+          description: ""
+          sortKey: -1757875847082
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email" : "rheynoternando@gmail.com",
+            	"password" : "12345678"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}sign-up"
+        name: Sign-up
+        meta:
+          id: req_bffe2ac3df9442958d3a17cf468b1ead
+          created: 1757873985858
+          modified: 1757875856961
+          isPrivate: false
+          description: ""
+          sortKey: -1757875847182
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"email" : "rheynofernando@gmail.com",
+            	"password" : "12345678",
+            	"name" : "aji"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/11.6.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}users/logout"
+        name: Logout
+        meta:
+          id: req_8afc8562d3e1410d82a585cef8dd1b38
+          created: 1757874054462
+          modified: 1757875864082
+          isPrivate: false
+          description: ""
+          sortKey: -1757875847282
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name" : "aji aka",
+            	"email" : "rheynofernando@gmail.com",
+            	"password" : "12345678",
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_28d4d325c1ad406988814e5db01e90b5
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_77d341356e8e45e59f287710d30e74f1
+          - id: pair_1f2ff6adf43e45949c9dcdb20a2d69ff
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+          - id: pair_2f8c2f742c7d4cdfb56e9a96eef23a34
+            name: ""
+            value: ""
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}users/8"
+        name: users/id
+        meta:
+          id: req_4b828826e1594a8e8158fe1791cc7e6a
+          created: 1757874371617
+          modified: 1757875891243
+          isPrivate: false
+          description: update users
+          sortKey: -1757875847382
+        method: PUT
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name" : "aji aka",
+            	"email" : "rheynofernando@gmail.com",
+            	"password" : "12345678"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_28d4d325c1ad406988814e5db01e90b5
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_77d341356e8e45e59f287710d30e74f1
+          - id: pair_1f2ff6adf43e45949c9dcdb20a2d69ff
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+          - id: pair_2f8c2f742c7d4cdfb56e9a96eef23a34
+            name: ""
+            value: ""
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.baseurl }}users/3"
+        name: users/id
+        meta:
+          id: req_f4749ecb395d450d89d4fea798f49d2e
+          created: 1757875176526
+          modified: 1757875894921
+          isPrivate: false
+          description: ""
+          sortKey: -1757875847482
+        method: DELETE
+        body:
+          mimeType: application/json
+          text: |-
+            {
+            	"name" : "aji aka",
+            	"email" : "rheynofernando@gmail.com",
+            	"password" : "12345678"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+            id: pair_28d4d325c1ad406988814e5db01e90b5
+          - name: User-Agent
+            value: insomnia/11.6.0
+            id: pair_77d341356e8e45e59f287710d30e74f1
+          - id: pair_1f2ff6adf43e45949c9dcdb20a2d69ff
+            name: Authorization
+            value: "{{ _.token }}"
+            description: ""
+            disabled: false
+          - id: pair_2f8c2f742c7d4cdfb56e9a96eef23a34
+            name: ""
+            value: ""
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - url: ws://localhost:8080/ws
+    name: New WebSocket Request
+    meta:
+      id: ws-req_35cd230bba65404cafb030a00c1fbe69
+      created: 1757826981517
+      modified: 1757826985430
+      description: ""
+      sortKey: -1757826981517
+    settings:
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+    headers:
+      - name: User-Agent
+        value: insomnia/11.6.0
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_cae533b0be3d04e2fabe51be9b3ae832dbbc2282
+    created: 1757826919625
+    modified: 1757826919625
+environments:
+  name: Base Environment
+  meta:
+    id: env_cae533b0be3d04e2fabe51be9b3ae832dbbc2282
+    created: 1757826919593
+    modified: 1757833036566
+    isPrivate: false
+  data:
+    token: Bearer
+      eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTc5MTk0MjEsInVzZXJfaWQiOjR9.5O9rf52wZAvyzfSHibZoFJ2cpmRXuABO9w0MJ84s2cU
+    baseurl: http://localhost:8080/
