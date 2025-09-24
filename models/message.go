@@ -8,7 +8,7 @@ type Message struct {
 	ReceiverID uint    `json:"receiver_id"`
 	Content    string  `json:"content"`
 	PublicID   string  `json:"public_id"`
-	Image      *string `json:"image_url"`
+	Image      *string `json:"image"`
 	Sender     User    `gorm:"foreignKey:SenderID;constraint:OnDelete:CASCADE"`
 	Receiver   User    `gorm:"foreignKey:ReceiverID;constraint:OnDelete:CASCADE"`
 }

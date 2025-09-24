@@ -64,7 +64,12 @@ func CreatePost(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create post"})
 		return
 	}
-
+	var newPost models.Post
+	if err := database.DB.Preload("User").First(&newPost, post.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch created post"})
+		return
+	}
+	ws.SendToClients(gin.H{"event": "post_created", "data": newPost})
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Post created successfully",
 		"data":    post,
@@ -73,7 +78,7 @@ func CreatePost(c *gin.Context) {
 
 func GetPost(c *gin.Context) {
 	var posts []models.Post
-	if err := database.DB.Find(&posts).Error; err != nil {
+	if err := database.DB.Preload("User").Find(&posts).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "post not found"})
 		return
 	}
@@ -82,7 +87,7 @@ func GetPost(c *gin.Context) {
 func GetPostId(c *gin.Context) {
 	id := c.Param("id")
 	var post models.Post
-	if err := database.DB.First(&post, id).Error; err != nil {
+	if err := database.DB.Preload("User").First(&post, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "post not found"})
 		return
 	}
@@ -92,36 +97,45 @@ func UpdatePost(c *gin.Context) {
 	id := c.Param("id")
 	var post models.Post
 
-	if err := database.DB.First(&post, id).Error; err != nil {
+	if err := database.DB.Preload("User").First(&post, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}
 
-	// ambil file baru dari form
+	content := c.PostForm("content")
+
+	updates := map[string]interface{}{
+		"content": content,
+	}
+
 	file, _ := c.FormFile("image")
 	if file != nil {
-		// hapus gambar lama di Cloudinary
 		if post.PublicID != "" {
 			utils.DeleteFromCloudinary(post.PublicID)
 		}
 
-		// upload file baru
 		filePath := "./uploads/" + file.Filename
-		c.SaveUploadedFile(file, filePath)
-
-		url, publicID, _ := utils.UploadImage(filePath, "posts")
-
-		post.Image = &url
-		post.PublicID = publicID
+		if err := c.SaveUploadedFile(file, filePath); err == nil {
+			url, publicID, _ := utils.UploadImage(filePath, "posts")
+			updates["image"] = url
+			updates["public_id"] = publicID
+		}
 	}
 
-	// update content
-	c.Bind(&post)
-	database.DB.Save(&post)
+	if err := database.DB.Model(&post).Updates(updates).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update post"})
+		return
+	}
 
-	ws.SendToClients(gin.H{"event": "post_created", "data": post})
+	var newPost models.Post
+	if err := database.DB.Preload("User").First(&newPost, post.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch updated post"})
+		return
+	}
 
-	c.JSON(http.StatusOK, post)
+	ws.SendToClients(gin.H{"event": "post_updated", "data": newPost})
+
+	c.JSON(http.StatusOK, newPost)
 }
 
 func DeletePost(c *gin.Context) {
@@ -137,7 +151,7 @@ func DeletePost(c *gin.Context) {
 	if post.PublicID != "" {
 		utils.DeleteFromCloudinary(post.PublicID)
 	}
-
+	ws.SendToClients(gin.H{"event": "post_deleted", "data": post})
 	database.DB.Delete(&post)
 	c.JSON(http.StatusOK, gin.H{"message": "Post deleted"})
 }

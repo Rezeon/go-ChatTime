@@ -12,6 +12,7 @@ import (
 
 	"gotry/database"
 	"gotry/models"
+	"gotry/utils"
 
 	"net/http"
 )
@@ -24,7 +25,7 @@ func SignUp(c *gin.Context) {
 		if errs, ok := err.(validator.ValidationErrors); ok {
 			errorMessages := make(map[string]string)
 			for _, e := range errs {
-				// Nama field + pesan error
+
 				errorMessages[e.Field()] = e.Tag()
 			}
 			c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -112,6 +113,71 @@ func Login(c *gin.Context) {
 		"token":   tokenString,
 	})
 }
+func UpdateUser(c *gin.Context) {
+	id := c.Param("id")
+	var user models.User
+
+	if err := database.DB.First(&user, id).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	var input struct {
+		Name  string `form:"name" json:"name"`
+		Email string `form:"email" json:"email"`
+	}
+
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	updates := map[string]interface{}{
+		"name":  input.Name,
+		"email": input.Email,
+	}
+
+	password := c.PostForm("password")
+	if password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
+			return
+		}
+		updates["password"] = string(hashedPassword)
+	}
+
+	file, _ := c.FormFile("profile")
+	if file != nil {
+		if user.PublicID != "" {
+			utils.DeleteFromCloudinary(user.PublicID)
+		}
+
+		tempPath := "./temp/" + file.Filename
+		if err := c.SaveUploadedFile(file, tempPath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save file"})
+			return
+		}
+
+		url, publicID, err := utils.UploadImage(tempPath, "users")
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		updates["profile"] = url
+		updates["public_id"] = publicID
+		os.Remove(tempPath)
+	}
+
+	// Lakukan update
+	if err := database.DB.Model(&user).Updates(updates).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
+}
 
 func Logout(c *gin.Context) {
 	tokenString := c.GetHeader("Authorization")
@@ -120,12 +186,26 @@ func Logout(c *gin.Context) {
 		return
 	}
 
-	// simpan ke blacklist
 	blacklisted := models.BlacklistedToken{
 		Token:     tokenString,
-		ExpiresAt: time.Now().Add(time.Hour * 24), // sama dengan exp JWT
+		ExpiresAt: time.Now().Add(time.Hour * 24),
 	}
 	database.DB.Create(&blacklisted)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logout success"})
+}
+func Me(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

@@ -97,6 +97,34 @@ func GetMessageByID(c *gin.Context) {
 	c.JSON(http.StatusOK, msg)
 }
 
+func GetMessageUser(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	id := c.Param("id")
+	uid := utils.InterfaceToUint(userID)
+
+	var msg []models.Message
+	if err := database.DB.
+		Preload("Sender").
+		Preload("Receiver").
+		Where("(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)", uid, id, id, uid).
+		Find(&msg).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get messages"})
+		return
+	}
+
+	if len(msg) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No messages found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, msg)
+}
+
 // UpdateMessage memperbarui pesan
 func UpdateMessage(c *gin.Context) {
 	id := c.Param("id")

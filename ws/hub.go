@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -16,14 +17,18 @@ var upgrader = websocket.Upgrader{
 func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		fmt.Println("❌ Upgrade error:", err)
 		return
 	}
 	defer ws.Close()
 
 	clients[ws] = true
+	fmt.Println("WebSocket connection")
+
 	for {
 		var msg interface{}
 		if err := ws.ReadJSON(&msg); err != nil {
+			fmt.Println("error:", err)
 			delete(clients, ws)
 			break
 		}
@@ -33,8 +38,13 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 func HandleMessage() {
 	for {
 		msg := <-broadcast
-		for clients := range clients {
-			clients.WriteJSON(msg)
+		for client := range clients {
+			err := client.WriteJSON(msg)
+			if err != nil {
+				fmt.Println("Write error:", err)
+				client.Close()
+				delete(clients, client)
+			}
 		}
 	}
 }
