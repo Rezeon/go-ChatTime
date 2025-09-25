@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 func FollowUser(c *gin.Context) {
-	// Ambil follower_id dari token
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -23,11 +23,20 @@ func FollowUser(c *gin.Context) {
 		FollowedID uint `form:"followed_id" json:"followed_id"`
 	}
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	// Cek apakah sudah follow
+	var followed models.User
+	if err := database.DB.First(&followed, input.FollowedID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Followed user not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database error"})
+		}
+		return
+	}
+
 	var existing models.Follow
 	if err := database.DB.Where("follower_id = ? AND followed_id = ?", followerID, input.FollowedID).First(&existing).Error; err == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Already following"})
@@ -41,6 +50,11 @@ func FollowUser(c *gin.Context) {
 
 	if err := database.DB.Create(&follow).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to follow"})
+		return
+	}
+
+	if err := database.DB.Preload("Follower").Preload("Followed").First(&follow, follow.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load follow data"})
 		return
 	}
 
@@ -67,7 +81,11 @@ func UnfollowUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unfollow"})
 		return
 	}
-	ws.SendToClients(gin.H{"event": "follow_unfollow", "data": follow})
+
+	if err := database.DB.Preload("Follower").Preload("Followed").Unscoped().First(&follow, follow.ID).Error; err == nil {
+		ws.SendToClients(gin.H{"event": "follow_unfollow", "data": follow})
+	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Unfollowed successfully"})
 }
 
@@ -79,7 +97,12 @@ func GetFollowers(c *gin.Context) {
 	}
 	var followers []models.Follow
 
-	if err := database.DB.Preload("Follower").Where("followed_id = ?", userID).Find(&followers).Error; err != nil {
+	if err := database.DB.
+		Preload("Follower", func(db *gorm.DB) *gorm.DB {
+			return db.Where("deleted_at IS NULL")
+		}).
+		Where("followed_id = ?", userID).
+		Find(&followers).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch followers"})
 		return
 	}
@@ -95,7 +118,12 @@ func GetFollowing(c *gin.Context) {
 	}
 	var following []models.Follow
 
-	if err := database.DB.Preload("Followed").Where("follower_id = ?", userID).Find(&following).Error; err != nil {
+	if err := database.DB.
+		Preload("Followed", func(db *gorm.DB) *gorm.DB {
+			return db.Where("deleted_at IS NULL")
+		}).
+		Where("follower_id = ?", userID).
+		Find(&following).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch following"})
 		return
 	}
