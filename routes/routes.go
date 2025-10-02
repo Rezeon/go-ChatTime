@@ -11,6 +11,7 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
+
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"}, // ganti "*" dengan domain FE kalau sudah production
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -18,6 +19,7 @@ func SetupRouter() *gin.Engine {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+	// untuk connect ke ws
 	r.GET("/ws", func(c *gin.Context) {
 		ws.HandleConnections(c.Writer, c.Request)
 	})

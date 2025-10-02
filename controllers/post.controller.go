@@ -30,11 +30,14 @@ func CreatePost(c *gin.Context) {
 	}
 
 	uid := utils.InterfaceToUint(userID)
-
+	// buat post baru
+	post := models.Post{
+		UserID:  uid,
+		Content: input.Content,
+	}
 	// handle upload file
 	file, _ := c.FormFile("image")
-	var url string
-	var publicID string
+
 	if file != nil {
 		tempPath := "./temp/" + file.Filename
 		if err := c.SaveUploadedFile(file, tempPath); err != nil {
@@ -42,22 +45,14 @@ func CreatePost(c *gin.Context) {
 			return
 		}
 
-		uploadedURL, uploadedPublicID, err := utils.UploadImage(tempPath, "posts")
+		url, publicID, err := utils.UploadImage(tempPath, "posts")
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		url = uploadedURL
-		publicID = uploadedPublicID
+		post.Image = &url
+		post.PublicID = publicID
 		os.Remove(tempPath)
-	}
-
-	// buat post baru
-	post := models.Post{
-		UserID:   uid,
-		Content:  input.Content,
-		Image:    &url,
-		PublicID: publicID,
 	}
 
 	if err := database.DB.Create(&post).Error; err != nil {

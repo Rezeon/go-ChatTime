@@ -7,22 +7,22 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[*websocket.Conn]bool)
-var broadcast = make(chan interface{})
+var clients = make(map[*websocket.Conn]bool) // untuk menyimpan client yang terhubung
+var broadcast = make(chan interface{})       // untuk membuat broadcast dan dikirim kek client
 
-var upgrader = websocket.Upgrader{
+var upgrader = websocket.Upgrader{ // mengubah http menjadi websocket/ws
 	CheckOrigin: func(r *http.Request) bool { return true },
 }
 
-func HandleConnections(w http.ResponseWriter, r *http.Request) {
+func HandleConnections(w http.ResponseWriter, r *http.Request) { // untuk menerima koneksi baru dari client
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println("❌ Upgrade error:", err)
+		fmt.Println("Upgrade error:", err)
 		return
 	}
-	defer ws.Close()
+	defer ws.Close() // otomatis menutup koneksi jika funsi selesai
 
-	clients[ws] = true
+	clients[ws] = true // jika berhasil akan disimpan
 	fmt.Println("WebSocket connection")
 
 	for {
@@ -36,11 +36,11 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleMessage() {
-	for {
+	for { // menunggu pesan baru dan akan dikirim ke client
 		msg := <-broadcast
 		for client := range clients {
 			err := client.WriteJSON(msg)
-			if err != nil {
+			if err != nil { // jika error koneksi kek client akan di close
 				fmt.Println("Write error:", err)
 				client.Close()
 				delete(clients, client)
