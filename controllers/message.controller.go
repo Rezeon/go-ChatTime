@@ -68,7 +68,8 @@ func CreateMessage(c *gin.Context) {
 	}
 
 	// kirim ke websocket
-	ws.SendToClients(gin.H{"event": "message_created", "data": msg})
+	ws.SendToUser(input.ReceiverID, gin.H{"event": "message_created", "data": msg})
+	ws.SendToUser(uid, gin.H{"event": "message_created", "data": msg})
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Message sent successfully",
@@ -158,7 +159,8 @@ func UpdateMessage(c *gin.Context) {
 
 	database.DB.Save(&msg)
 
-	ws.SendToClients(gin.H{"event": "message_updated", "data": msg})
+	ws.SendToUser(msg.ReceiverID, gin.H{"event": "message_updated", "data": msg})
+	ws.SendToUser(msg.SenderID, gin.H{"event": "message_updated", "data": msg})
 
 	c.JSON(http.StatusOK, msg)
 }
@@ -176,10 +178,10 @@ func DeleteMessage(c *gin.Context) {
 	if msg.PublicID != "" {
 		utils.DeleteFromCloudinary(msg.PublicID)
 	}
+	ws.SendToUser(msg.ReceiverID, gin.H{"event": "message_deleted", "data": msg})
+	ws.SendToUser(msg.SenderID, gin.H{"event": "message_deleted", "data": msg})
 
 	database.DB.Delete(&msg)
-
-	ws.SendToClients(gin.H{"event": "message_deleted", "data": id})
 
 	c.JSON(http.StatusOK, gin.H{"message": "Message deleted"})
 }

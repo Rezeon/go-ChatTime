@@ -21,7 +21,7 @@ func SetupRouter() *gin.Engine {
 	}))
 	// untuk connect ke ws
 	r.GET("/ws", func(c *gin.Context) {
-		ws.HandleConnections(c.Writer, c.Request)
+		ws.HandleConnections(c)
 	})
 
 	r.POST("/login", controllers.Login)

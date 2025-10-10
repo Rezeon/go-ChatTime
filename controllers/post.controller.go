@@ -11,6 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Ambil semua ID follower dari user tertentu
+func getFriendIDs(userID uint) ([]uint, error) {
+	var follows []models.Follow
+	if err := database.DB.Where("following_id = ?", userID).Find(&follows).Error; err != nil {
+		return nil, err
+	}
+
+	friendIDs := make([]uint, 0, len(follows))
+	for _, f := range follows {
+		friendIDs = append(friendIDs, f.FollowerID, userID)
+	}
+	return friendIDs, nil
+}
 func CreatePost(c *gin.Context) {
 	var input struct {
 		Content string `form:"content" json:"content"`
@@ -64,7 +77,16 @@ func CreatePost(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch created post"})
 		return
 	}
-	ws.SendToClients(gin.H{"event": "post_created", "data": newPost})
+	friendIDs, err := getFriendIDs(uid)
+
+	if err == nil {
+		for _, fid := range friendIDs {
+			ws.SendToUser(fid, gin.H{
+				"event": "post_created",
+				"data":  newPost,
+			})
+		}
+	}
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Post created successfully",
 		"data":    post,
@@ -96,6 +118,13 @@ func UpdatePost(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uid := utils.InterfaceToUint(userID)
 
 	content := c.PostForm("content")
 
@@ -128,8 +157,17 @@ func UpdatePost(c *gin.Context) {
 		return
 	}
 
-	ws.SendToClients(gin.H{"event": "post_updated", "data": newPost})
+	//ws.SendToClients(gin.H{"event": "post_updated", "data": newPost})
+	friendIDs, err := getFriendIDs(uid)
 
+	if err == nil {
+		for _, fid := range friendIDs {
+			ws.SendToUser(fid, gin.H{
+				"event": "post_updated",
+				"data":  newPost,
+			})
+		}
+	}
 	c.JSON(http.StatusOK, newPost)
 }
 
@@ -141,12 +179,28 @@ func DeletePost(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
 		return
 	}
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	uid := utils.InterfaceToUint(userID)
 
 	// hapus gambar di Cloudinary
 	if post.PublicID != "" {
 		utils.DeleteFromCloudinary(post.PublicID)
 	}
-	ws.SendToClients(gin.H{"event": "post_deleted", "data": post})
+	friendIDs, err := getFriendIDs(uid)
+
+	if err == nil {
+		for _, fid := range friendIDs {
+			ws.SendToUser(fid, gin.H{
+				"event": "post_updated",
+				"data":  post,
+			})
+		}
+	}
 	database.DB.Delete(&post)
 	c.JSON(http.StatusOK, gin.H{"message": "Post deleted"})
 }

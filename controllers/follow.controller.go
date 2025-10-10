@@ -57,8 +57,9 @@ func FollowUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load follow data"})
 		return
 	}
+	ws.SendToUser(follow.FollowedID, gin.H{"event": "follow_created", "data": follow})
+	ws.SendToUser(followerID, gin.H{"event": "follow_created", "data": follow})
 
-	ws.SendToClients(gin.H{"event": "follow_created", "data": follow})
 	c.JSON(http.StatusCreated, gin.H{"message": "Followed successfully", "data": follow})
 }
 
@@ -83,7 +84,9 @@ func UnfollowUser(c *gin.Context) {
 	}
 
 	if err := database.DB.Preload("Follower").Preload("Followed").Unscoped().First(&follow, follow.ID).Error; err == nil {
-		ws.SendToClients(gin.H{"event": "follow_unfollow", "data": follow})
+		//ws.SendToClients(gin.H{"event": "follow_unfollow", "data": follow})
+		ws.SendToUser(follow.FollowedID, gin.H{"event": "follow_unfollow", "data": follow.ID})
+		ws.SendToUser(follow.FollowerID, gin.H{"event": "follow_unfollow", "data": follow.ID})
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Unfollowed successfully"})

@@ -4,7 +4,6 @@ import (
 	"gotry/database"
 	"gotry/models"
 	"gotry/routes"
-	"gotry/ws"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -29,7 +28,6 @@ func main() {
 		zap.Strings("tables", []string{"users", "posts", "follows", "messages"}))
 
 	r := routes.SetupRouter()
-	go ws.HandleMessage()
 	logger.Info("Server running at http://localhost:8080")
 
 	port := os.Getenv("PORT")
